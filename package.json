@@ -1,0 +1,30 @@
+{
+  "name": "dos-arkivaros",
+  "version": "1.0.0",
+  "description": "Collection of scripts that handle practical archive jobs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vtfk/dos-arkivaros.git"
+  },
+  "keywords": [
+    "archive",
+    "p360"
+  ],
+  "author": "jorgtho",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vtfk/dos-arkivaros/issues"
+  },
+  "homepage": "https://github.com/vtfk/dos-arkivaros#readme",
+  "dependencies": {
+    "@vestfoldfylke/msal-token": "^1.0.1",
+    "@vtfk/logger": "^6.0.1",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
+    "file-system-cache": "^2.4.4"
+  }
+}

@@ -128,3 +128,12 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Local cache'
+.file-cache/
+
+
+# Ignore dir and files
+ignore/
+ignore-units.txt
+ignore-unit-leaders.txt
