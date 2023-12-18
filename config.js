@@ -1,12 +1,13 @@
 require('dotenv').config()
 const { existsSync, readFileSync, writeFileSync } = require('fs')
 
-if (!existsSync('./ignore-units.txt')) writeFileSync('./ignore-units.txt', 'Legg til kortnavn eller organisasjonskode som skal ignoreres her, separeres med newline')
-if (!existsSync('./ignore-unit-leaders.txt')) writeFileSync('./ignore-unit-leaders.txt', 'Legg til kortnavn eller organisasjonskode som skal ignoreres her, separeres med newline')
-const IGNORE_UNITS = readFileSync('./ignore-units.txt').toString().replaceAll('\r', '').split('\n')
-const IGNORE_UNIT_LEADERS = readFileSync('./ignore-unit-leaders.txt').toString().replaceAll('\r', '').split('\n')
+if (!existsSync('./ORG-SYNC/ignore-units.txt')) writeFileSync('./ORG-SYNC/ignore-units.txt', 'Legg til kortnavn eller organisasjonskode som skal ignoreres her, separeres med newline')
+if (!existsSync('./ORG-SYNC/ignore-unit-leaders.txt')) writeFileSync('./ORG-SYNC/ignore-unit-leaders.txt', 'Legg til kortnavn eller organisasjonskode som skal ignoreres her, separeres med newline')
+const IGNORE_UNITS = readFileSync('./ORG-SYNC/ignore-units.txt').toString().replaceAll('\r', '').split('\n')
+const IGNORE_UNIT_LEADERS = readFileSync('./ORG-SYNC/ignore-unit-leaders.txt').toString().replaceAll('\r', '').split('\n')
 
 module.exports = {
+  NODE_ENV: process.env.NODE_ENV || 'dev',
   APPREG: {
     CLIENT_ID: process.env.APPREG_CLIENT_ID,
     CLIENT_SECRET: process.env.APPREG_CLIENT_SECRET,
@@ -29,7 +30,10 @@ module.exports = {
     KEY: process.env.MAIL_KEY
   },
   ORG_SYNC: {
-    EMAILS: (process.env.ORG_SYNC_EMAILS && (process.env.ORG_SYNC_EMAILS.split(','))) || [],
+    MAIL_RECIPIENTS: (process.env.ORG_SYNC_MAIL_RECIPIENTS && (process.env.ORG_SYNC_MAIL_RECIPIENTS.split(','))),
+    MAIL_SENDER: process.env.ORG_SYNC_MAIL_SENDER,
+    MAIL_BCCS: (process.env.ORG_SYNC_MAIL_BCCS && (process.env.ORG_SYNC_MAIL_BCCS.split(','))) || null,
+    MAIL_TEMPLATE: process.env.ORG_SYNC_MAIL_TEMPLATE,
     IGNORE_UNITS,
     IGNORE_UNIT_LEADERS
   },

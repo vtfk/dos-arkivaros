@@ -1,7 +1,6 @@
 const { logger } = require('@vtfk/logger')
 const { callFintfolk } = require('../lib/call-fintfolk')
 const { callArchive } = require('../lib/call-archive')
-const { writeFileSync } = require('fs')
 const { ORG_SYNC } = require('../config')
 const { getCorrespondingEnterprise } = require('./get-corresponding-enterprise')
 
@@ -37,9 +36,6 @@ const enterpriseSync = async () => {
   const archiveInternalEnterprises = await callArchive('archive', enterprisePayload)
   logger('info', ['Got internal enterprises from archive'])
 
-  writeFileSync('./ignore/fintOrganization.json', JSON.stringify(fintOrganization, null, 2))
-  writeFileSync('./ignore/archiveInternalEnterprises.json', JSON.stringify(archiveInternalEnterprises, null, 2))
-
   const result = {
     correspondingEnterprises: [],
     missingEnterprises: [],
@@ -63,12 +59,28 @@ const enterpriseSync = async () => {
 
     let needsUpdate = false
     if (enterprise.ExternalID !== unit.organisasjonsKode) needsUpdate = true
-    else if (enterprise.Initials !== unit.kortnavn) needsUpdate = true
+    else if (unit.kortnavn && (enterprise.Initials !== unit.kortnavn)) needsUpdate = true
 
     if (needsUpdate) {
       logger('info', [unit.navn, unit.organisasjonsKode, 'Corresponding enterprise did not match FINT unit, updating with correct Initials and ExternalID'])
       // Update the stuff (keep the name - let archive decide)
-      result.updateResult.push({ enterpriseName: enterprise.Name, Initials: unit.kortnavn, ExternalID: unit.organisasjonsKode }) // Send rapport på hvilke enheter som er oppdatert
+      logger('info', ['Fetching internal enterprises from archive'])
+      const enterprisePayload = {
+        service: 'ContactService',
+        method: 'UpdateEnterprise',
+        parameter: {
+          Recno: enterprise.Recno,
+          ExternalID: unit.organisasjonsKode
+        }
+      }
+      if (unit.kortnavn) enterprisePayload.parameter.Initials = unit.kortnavn // Pass på å itj legg til dersom kortnavn er null
+      try {
+        await callArchive('archive', enterprisePayload)
+        result.updateResult.push({ enterpriseName: enterprise.Name, Initials: unit.kortnavn, ExternalID: unit.organisasjonsKode })
+        logger('info', [unit.navn, unit.organisasjonsKode, `Recno: ${enterprise.Recno}`, 'Succesfully updated enterprise'])
+      } catch (error) {
+        logger('error', [unit.navn, unit.organisasjonsKode, `Recno: ${enterprise.Recno}`, 'Failed when updating enterprise, will have to try again next time...', error.response?.data || error.stack || error.toString()])
+      }
     }
     result.correspondingEnterprises.push({ enterprise, unit })
   }

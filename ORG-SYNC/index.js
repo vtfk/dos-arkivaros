@@ -5,7 +5,7 @@
   const { leaderCheck } = require('./leader-check')
   const { writeFileSync } = require('fs')
   const axios = require('../lib/axios-instance').getAxiosInstance()
-  const { MAIL } = require('../config')
+  const { MAIL, ORG_SYNC, NODE_ENV } = require('../config')
 
   // Set up logging
   logConfig({
@@ -23,7 +23,6 @@
     enterpriseResult = await enterpriseSync()
     const { correspondingEnterprises, missingEnterprises, updateResult } = enterpriseResult
     logger('info', ['Successfully generated enterpriseResult', 'correspondingEnterprises', correspondingEnterprises.length, 'missingEnterprises', missingEnterprises.length, 'updatedEnterprises', updateResult.length])
-    writeFileSync('./ignore/enterpriseResult.json', JSON.stringify(enterpriseResult, null, 2))
   } catch (error) {
     logger('error', ['Failed when running enterprise-sync, shutting down for now', error.response?.data || error.stack || error.toString()])
     process.exit(1)
@@ -38,13 +37,13 @@
     const leaderName = unit.leder?.ansattnummer ? unit.leder.navn : 'Ingen leder i HR'
     const overordnet = unit.overordnet.kortnavn ? `${unit.overordnet.navn} (${unit.overordnet.kortnavn})` : `${unit.overordnet.navn} (mangler kortnavn)`
     const level = levels[unit.level]
-    return `<li><strong>${unit.navn}</strong><ul><li>Kortnavn: ${unit.kortnavn || 'mangler kortnavn'}</li><li>Leder: ${leaderName}</li><li>Morselskap: ${overordnet}</li><li>Orgnivå: ${level}</li></ul></li>`
+    return `<li><strong>${unit.navn}</strong> (Trenger oppretting/oppdatering med kortnavn)<ul><li>Kortnavn: ${unit.kortnavn || 'mangler kortnavn'}</li><li>Leder: ${leaderName}</li><li>Morselskap: ${overordnet}</li><li>Orgnivå: ${level}</li></ul></li>`
   })
   const updatedEnterprisesEmailList = enterpriseResult.updateResult.map(enterprise => {
     return `<li><strong>${enterprise.enterpriseName}</strong><ul><li>Kortnavn: ${enterprise.Initials}</li></ul></li>`
   })
 
-  const mailBody = `<h2>Virksomheter som enten mangler eller ikke matcher enhet i HR</h2>
+  const mailBody = `<h2>P360-${NODE_ENV === 'production' ? 'PROD' : 'TEST'} interne virksomheter som enten mangler eller ikke matcher enhet i HR</h2>
     <i>Dersom en intern virksomhet IKKE skal opprettes / være i P360, send kortnavnet til ansvarlig utvikler - så legger vi virksomheten til i unntakslista</i>
     <br>
     Dersom den interne virksomheten allerede finnes i P360, sleng på det korrekte kortnavnet fra HR, og roboten vil finne match ved neste kjøring 👍
@@ -53,6 +52,7 @@
     </ul>
     <br>
     <h2>Virksomheter som roboten oppdaterte med korrekt kortnavn og/eller organisasjonsKode fra HR</h2>
+    <i>Disse er bare til info, trengs ikke gjøres noe</i>
     <ul>
     ${updatedEnterprisesEmailList.join('')}
     </ul>
@@ -60,11 +60,11 @@
     `
 
   const mailPayload = {
-    to: ['jorgen.thorsnes@vtfk.no'],
+    to: ORG_SYNC.MAIL_RECIPIENTS,
     from: 'noreply@vtfk.no',
-    subject: `Virksomhetsrapport - ${fancyDate}`,
+    subject: `P360 - ${NODE_ENV === 'production' ? 'PROD' : 'TEST'} - Virksomhetsrapport - ${fancyDate}`,
     template: {
-      templateName: 'vestfoldfylke',
+      templateName: ORG_SYNC.MAIL_TEMPLATE,
       templateData: {
         body: mailBody,
         signature: {
@@ -87,7 +87,6 @@
   try {
     leaderCheckResult = await leaderCheck(enterpriseResult.correspondingEnterprises)
     logger('info', ['Successfully generated leaderCheckResult', 'succesfullyCheckedUnits', leaderCheckResult.length])
-    writeFileSync('./ignore/leaderCheckResult.json', JSON.stringify(leaderCheckResult, null, 2))
   } catch (error) {
     logger('error', ['Failed when running leaderCheck, shutting down for now', error.response?.data || error.stack || error.toString()])
     process.exit(1)
@@ -102,30 +101,30 @@
     const leaderName = unit.leder?.ansattnummer ? unit.leder.navn : 'Ingen leder i HR'
     const overordnet = unit.overordnet.kortnavn ? `${unit.overordnet.navn} (${unit.overordnet.kortnavn})` : `${unit.overordnet.navn} (mangler kortnavn)`
     const level = levels[unit.level]
-    return `<li><strong>${enterprise.Name}</strong><ul><li>Kortnavn: ${unit.kortnavn || 'mangler kortnavn'}</li><li>Leder i HR: ${leaderName}</li><li>Morselskap: ${overordnet}</li><li>Orgnivå: ${level}</li></ul></li>`
+    return `<li><strong>${enterprise.Name}</strong> (Mangler direkte leder i P360) <ul><li>Kortnavn: ${unit.kortnavn || 'mangler kortnavn'}</li><li>Leder i HR: ${leaderName}</li><li>Morselskap: ${overordnet}</li><li>Orgnivå: ${level}</li></ul></li>`
   })
   const missingFintLeaderEmailList = missingFintLeader.map(result => {
     const { leaderResult, enterprise } = result
     const archiveLeaderNames = leaderResult.archiveLeaders.length > 0 ? leaderResult.archiveLeaders.map(leader => leader.Name).join(', ') : 'Ingen'
-    return `<li><strong>${enterprise.Name}</strong><ul><li>Kortnavn: ${enterprise.Initials}</li><li>Ledere i P360: ${archiveLeaderNames}</li></ul></li>`
+    return `<li><strong>${enterprise.Name}</strong> (Mangler leder i HR)<ul><li>Kortnavn: ${enterprise.Initials}</li><li>Ledere i P360: ${archiveLeaderNames}</li></ul></li>`
   })
   const incorrectLeaderEmailList = incorrectLeader.map(result => {
     const { unit, leaderResult, enterprise } = result
     const archiveLeaderNames = leaderResult.archiveLeaders.length > 0 ? leaderResult.archiveLeaders.map(leader => leader.Name).join(', ') : 'Ingen'
-    return `<li><strong>${enterprise.Name}</strong><ul><li>Kortnavn: ${enterprise.Initials}</li><li>Leder i HR: ${unit.leder.navn}</li><li>LedereW i P360: ${archiveLeaderNames}</li></ul></li>`
+    return `<li><strong>${enterprise.Name}</strong> (Har forskjellig leder fra HR)<ul><li>Kortnavn: ${enterprise.Initials}</li><li>Leder i HR: ${unit.leder.navn}</li><li>Ledere i P360: ${archiveLeaderNames}</li></ul></li>`
   })
 
-  const leaderMailBody = `<h2>Virksomheter som mangler leder i P360</h2>
+  const leaderMailBody = `<h2>P360-${NODE_ENV === 'production' ? 'PROD' : 'TEST'} interne virksomheter som mangler direkte leder</h2>
     <i>Merk at det kan være leder i linje som er korrekt her - sjekk morselskap før det evt opprettes enda en lederprofil på brukeren</i>
     <ul>
     ${missingLeaderInArchiveEmailList.join('')}
     </ul>
-    <h2>Virksomheter som mangler leder i HR</h2>
+    <h2>Organisasjons-enheter som mangler leder i HR</h2>
     <i>Vet ikke helt hva vi gjør med disse.. må vel sjekkes manuelt</i>
     <ul>
     ${missingFintLeaderEmailList.join('')}
     </ul>
-    <h2>Virksomheter som mangler korrekt leder</h2>
+    <h2>P360-${NODE_ENV === 'production' ? 'PROD' : 'TEST'} interne virksomheter som mangler korrekt leder</h2>
     <i>Disse bør vel bare sjekkes forsåvidt</i>
     <ul>
     ${incorrectLeaderEmailList.join('')}
@@ -133,11 +132,11 @@
     `
 
   const leaderMailPayload = {
-    to: ['jorgen.thorsnes@vtfk.no'],
+    to: ORG_SYNC.MAIL_RECIPIENTS,
     from: 'noreply@vtfk.no',
-    subject: `P360 Virksomhets-lederrapport - ${fancyDate}`,
+    subject: `P360 - ${NODE_ENV === 'production' ? 'PROD' : 'TEST'} - Virksomhets-lederrapport - ${fancyDate}`,
     template: {
-      templateName: 'vestfoldfylke',
+      templateName: ORG_SYNC.MAIL_TEMPLATE,
       templateData: {
         body: leaderMailBody,
         signature: {
