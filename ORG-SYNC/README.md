@@ -11,8 +11,14 @@
   - Om vi har tilsvarende enhet - sjekk om externId og kortnavn er korrekt, om ikke oppdater
     - Legg til både FINT-enhet og virksomhet i en resultatliste
     - Legg til status på hva roboten har gjort (kortnavn externalID, evt navn?)
+  - Sender e-post med rapport til arkiv
 
 - Henter alle users fra P360
 - For hver enhet/virksomhet fra resultatlista
-  - Sjekk at det finnes en bruker som har rollen "leder" (role: 3) for enterprisen sitt recno. Sjekk også kanskje at user sin contactRecno har samme navn som lederen for enheten i FINT
-  - Dersom leder ikke matcher riktig legg til i "feil leder" liste
+  - Sjekk at det finnes en bruker som har rollen "leder" (role: 3) for enterprisen sitt recno. Sjekk også om user sin contactRecno har samme navn som lederen for enheten i FINT
+- Sender e-post med rapport til arkiv om:
+  - Hvilke interne virksomheter har ikke leder i P360
+  - Hvilke interne virksomheter i P360 har en matchende enhet i HR, men mangler leder i HR
+  - Hvilke interne virksomheter har leder - men navnet på lederen matcher ikke navnet på lederen i HR
+
+
