@@ -64,7 +64,7 @@ const enterpriseSync = async () => {
     if (needsUpdate) {
       logger('info', [unit.navn, unit.organisasjonsKode, 'Corresponding enterprise did not match FINT unit, updating with correct Initials and ExternalID'])
       // Update the stuff (keep the name - let archive decide)
-      logger('info', ['Fetching internal enterprises from archive'])
+      logger('info', [unit.navn, unit.organisasjonsKode, 'Updating internal enterprises from archive'])
       const enterprisePayload = {
         service: 'ContactService',
         method: 'UpdateEnterprise',

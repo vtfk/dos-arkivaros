@@ -3,8 +3,8 @@ const { existsSync, readFileSync, writeFileSync } = require('fs')
 
 if (!existsSync('./ORG-SYNC/ignore-units.txt')) writeFileSync('./ORG-SYNC/ignore-units.txt', 'Legg til kortnavn eller organisasjonskode som skal ignoreres her, separeres med newline')
 if (!existsSync('./ORG-SYNC/ignore-unit-leaders.txt')) writeFileSync('./ORG-SYNC/ignore-unit-leaders.txt', 'Legg til kortnavn eller organisasjonskode som skal ignoreres her, separeres med newline')
-const IGNORE_UNITS = readFileSync('./ORG-SYNC/ignore-units.txt').toString().replaceAll('\r', '').split('\n')
-const IGNORE_UNIT_LEADERS = readFileSync('./ORG-SYNC/ignore-unit-leaders.txt').toString().replaceAll('\r', '').split('\n')
+const IGNORE_UNITS = readFileSync('./ORG-SYNC/ignore-units.txt').toString().replaceAll('\r', '').split('\n').filter(ele => ele && ele !== '' && ele.length > 1)
+const IGNORE_UNIT_LEADERS = readFileSync('./ORG-SYNC/ignore-unit-leaders.txt').toString().replaceAll('\r', '').split('\n').filter(ele => ele && ele !== '' && ele.length > 1)
 
 module.exports = {
   NODE_ENV: process.env.NODE_ENV || 'dev',
