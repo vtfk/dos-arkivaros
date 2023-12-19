@@ -70,7 +70,8 @@ const enterpriseSync = async () => {
         method: 'UpdateEnterprise',
         parameter: {
           Recno: enterprise.Recno,
-          ExternalID: unit.organisasjonsKode
+          ExternalID: unit.organisasjonsKode,
+          AccessGroup: 'Alle'
         }
       }
       if (unit.kortnavn) enterprisePayload.parameter.Initials = unit.kortnavn // Pass på å itj legg til dersom kortnavn er null
