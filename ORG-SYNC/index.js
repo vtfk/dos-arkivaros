@@ -40,7 +40,7 @@
     return `<li><strong>${unit.navn}</strong> (Trenger oppretting/oppdatering med kortnavn)<ul><li>Kortnavn: ${unit.kortnavn || 'mangler kortnavn'}</li><li>Leder: ${leaderName}</li><li>Morselskap: ${overordnet}</li><li>Orgnivå: ${level}</li></ul></li>`
   })
   const updatedEnterprisesEmailList = enterpriseResult.updateResult.map(enterprise => {
-    return `<li><strong>${enterprise.enterpriseName}</strong><ul><li>Kortnavn: ${enterprise.Initials}</li></ul></li>`
+    return `<li><strong>${enterprise.enterpriseName}</strong> (Navn fra P360)<ul><li>Kortnavn: ${enterprise.Initials}</li></ul></li>`
   })
 
   const mailBody = `<h2>P360-${NODE_ENV === 'production' ? 'PROD' : 'TEST'} interne virksomheter som enten mangler eller ikke matcher enhet i HR</h2>
