@@ -133,7 +133,7 @@
 
   const leaderMailPayload = {
     to: ORG_SYNC.MAIL_RECIPIENTS,
-    from: 'noreply@vtfk.no',
+    from: ORG_SYNC.MAIL_SENDER || 'noreply@vtfk.no',
     subject: `P360 - ${NODE_ENV === 'production' ? 'PROD' : 'TEST'} - Virksomhets-lederrapport - ${fancyDate}`,
     template: {
       templateName: ORG_SYNC.MAIL_TEMPLATE,
