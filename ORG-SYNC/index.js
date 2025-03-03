@@ -32,7 +32,7 @@
   const now = new Date()
   const fancyDate = `${now.getDate()}.${now.getMonth() + 1}.${now.getFullYear()}`
 
-  const levels = ['Fylkeskommune (0)', 'Fylkesdirektør (1)', 'Sektor (2)', 'Seksjon (3)', 'Team (4)', 'Faggruppe (5)']
+  const levels = ['Fylkeskommune (0)', 'Sektor/stab (1)', 'Seksjon (2)', 'Team (3)', 'Underteam (4)', 'Underunderteam (5)']
   const missingEnterprisesEmailList = enterpriseResult.missingEnterprises.map(unit => {
     const leaderName = unit.leder?.ansattnummer ? unit.leder.navn : 'Ingen leder i HR'
     const overordnet = unit.overordnet.kortnavn ? `${unit.overordnet.navn} (${unit.overordnet.kortnavn})` : `${unit.overordnet.navn} (mangler kortnavn)`
@@ -40,7 +40,13 @@
     return `<li><strong>${unit.navn}</strong> (Trenger oppretting/oppdatering med kortnavn)<ul><li>Kortnavn: ${unit.kortnavn || 'mangler kortnavn'}</li><li>Leder: ${leaderName}</li><li>Morselskap: ${overordnet}</li><li>Orgnivå: ${level}</li></ul></li>`
   })
   const updatedEnterprisesEmailList = enterpriseResult.updateResult.map(enterprise => {
-    return `<li><strong>${enterprise.enterpriseName}</strong> (Navn fra P360)<ul><li>Kortnavn: ${enterprise.Initials}</li></ul></li>`
+    const shortNameInfo = `fra ${enterprise.InitialsFrom} til ${enterprise.InitialsTo}`
+    const externalIDInfo = `fra ${enterprise.ExternalIDFrom} til ${enterprise.ExternalIDTo}`
+    let updateString = `<li><strong>${enterprise.enterpriseName}</strong> (Navn fra P360)<ul>`
+    if (enterprise.wrongKortnavn) updateString += `<li>Kortnavn: ${shortNameInfo}</li>`
+    if (enterprise.wrongOrganisasjonsKode) updateString += `<li>ExternaID (orgKode): ${externalIDInfo}</li>`
+    updateString += '</ul></li>'
+    return updateString
   })
 
   const mailBody = `<h2>P360-${NODE_ENV === 'production' ? 'PROD' : 'TEST'} interne virksomheter som enten mangler eller ikke matcher enhet i HR</h2>
@@ -61,7 +67,7 @@
 
   const mailPayload = {
     to: ORG_SYNC.MAIL_RECIPIENTS,
-    from: 'noreply@vtfk.no',
+    from: ORG_SYNC.MAIL_SENDER,
     subject: `P360 - ${NODE_ENV === 'production' ? 'PROD' : 'TEST'} - Virksomhetsrapport - ${fancyDate}`,
     template: {
       templateName: ORG_SYNC.MAIL_TEMPLATE,

@@ -21,8 +21,8 @@ const { getCorrespondingEnterprise } = require('./get-corresponding-enterprise')
 
 const enterpriseSync = async () => {
   logger('info', ['Fetching organization from FINTFOLK'])
-  const fintOrganization = await callFintfolk('organization/flat')
-  logger('info', ['Got organization from FINTFOLK'])
+  const fintOrganization = await callFintfolk('organizationfixed/flat')
+  logger('info', ['Got organization fixed from FINTFOLK'])
 
   logger('info', ['Fetching internal enterprises from archive'])
   const enterprisePayload = {
@@ -57,12 +57,12 @@ const enterpriseSync = async () => {
     }
     logger('info', [unit.navn, unit.organisasjonsKode, `Corresponding enterprise found by match on "${foundBy}", checking if needs update`])
 
-    let needsUpdate = false
-    if (enterprise.ExternalID !== unit.organisasjonsKode) needsUpdate = true
-    else if (unit.kortnavn && (enterprise.Initials !== unit.kortnavn)) needsUpdate = true
+    const wrongOrganisasjonsKode = unit.organisasjonsKode && enterprise.ExternalID !== unit.organisasjonsKode
+    const wrongKortnavn = Boolean(unit.kortnavn) && (enterprise.Initials !== unit.kortnavn)
+    const needsUpdate = wrongOrganisasjonsKode || wrongKortnavn
 
     if (needsUpdate) {
-      logger('info', [unit.navn, unit.organisasjonsKode, 'Corresponding enterprise did not match FINT unit, updating with correct Initials and ExternalID'])
+      logger('info', [unit.navn, unit.organisasjonsKode, `Corresponding enterprise did not match FINT unit, updating with correct Initials: ${unit.kortnavn} (was ${enterprise.Initials}) and ExternalID: ${unit.organisasjonsKode} (was ${enterprise.ExternalID})`])
       // Update the stuff (keep the name - let archive decide)
       logger('info', [unit.navn, unit.organisasjonsKode, 'Updating internal enterprises from archive'])
       const enterprisePayload = {
@@ -76,8 +76,9 @@ const enterpriseSync = async () => {
       }
       if (unit.kortnavn) enterprisePayload.parameter.Initials = unit.kortnavn // Pass på å itj legg til dersom kortnavn er null
       try {
+        // logger('info', [unit.navn, unit.organisasjonsKode, `Recno: ${enterprise.Recno}`, 'Pretending to update enterprise'])
         await callArchive('archive', enterprisePayload)
-        result.updateResult.push({ enterpriseName: enterprise.Name, Initials: unit.kortnavn, ExternalID: unit.organisasjonsKode })
+        result.updateResult.push({ wrongOrganisasjonsKode, wrongKortnavn, enterpriseName: enterprise.Name, InitialsFrom: enterprise.Initials, InitialsTo: unit.kortnavn, ExternalIDFrom: enterprise.ExternalID, ExternalIDTo: unit.organisasjonsKode })
         logger('info', [unit.navn, unit.organisasjonsKode, `Recno: ${enterprise.Recno}`, 'Succesfully updated enterprise'])
       } catch (error) {
         logger('error', [unit.navn, unit.organisasjonsKode, `Recno: ${enterprise.Recno}`, 'Failed when updating enterprise, will have to try again next time...', error.response?.data || error.stack || error.toString()])
