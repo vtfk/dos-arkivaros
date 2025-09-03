@@ -138,3 +138,6 @@ dist
 ignore/
 ignore-units.txt
 ignore-unit-leaders.txt
+
+# Elevmappe sync view permissions
+ELEVMAPPE-VIEW-PERMISSIONS/data/*
