@@ -21,10 +21,9 @@
   },
   "homepage": "https://github.com/vtfk/dos-arkivaros#readme",
   "dependencies": {
-    "@vestfoldfylke/msal-token": "^1.0.1",
-    "@vtfk/logger": "^6.0.1",
-    "axios": "^1.6.2",
-    "dotenv": "^16.3.1",
-    "file-system-cache": "^2.4.4"
+    "@azure/identity": "^4.11.1",
+    "@vtfk/logger": "^6.3.4",
+    "axios": "^1.11.0",
+    "dotenv": "^16.3.1"
   }
 }

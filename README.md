@@ -16,9 +16,9 @@ Sørger for at p360 interne virksomheter har korrekt kortkode, og ExternalID lik
 Lag deg en .env fil med følgende verdier (du skjønner hvilke du trenger for hvilket script ved å se på prefix...)
 
 ```bash
-APPREG_CLIENT_ID="app reg for dette repoet"
-APPREG_TENANT_ID="app reg for dette repoet"
-APPREG_CLIENT_SECRET="app reg for dette repoet"
+AZURE_CLIENT_ID="app reg for dette repoet"
+AZURE_TENANT_ID="app reg for dette repoet"
+AZURE_CLIENT_SECRET="app reg for dette repoet"
 ARCHIVE_URL="url til azf-archive-v2"
 ARCHIVE_SCOPE="scope for azf-archive-v2"
 FINTFOLK_URL="url til azf-fintfolk api"

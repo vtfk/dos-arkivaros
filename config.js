@@ -6,6 +6,27 @@ if (!existsSync('./ORG-SYNC/ignore-unit-leaders.txt')) writeFileSync('./ORG-SYNC
 const IGNORE_UNITS = readFileSync('./ORG-SYNC/ignore-units.txt').toString().replaceAll('\r', '').split('\n').filter(ele => ele && ele !== '' && ele.length > 1)
 const IGNORE_UNIT_LEADERS = readFileSync('./ORG-SYNC/ignore-unit-leaders.txt').toString().replaceAll('\r', '').split('\n').filter(ele => ele && ele !== '' && ele.length > 1)
 
+// Check if required environment variables are set
+const requiredEnvVars = [
+  'AZURE_CLIENT_ID', // Autmomatically used by AzureIdentity SDK
+  'AZURE_TENANT_ID', // Autmomatically used by AzureIdentity SDK
+  'AZURE_CLIENT_SECRET', // Autmomatically used by AzureIdentity SDK
+  'ARCHIVE_URL',
+  'ARCHIVE_SCOPE'
+]
+
+const missingEnvVars = []
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    missingEnvVars.push(envVar)
+  }
+}
+
+if (missingEnvVars.length > 0) {
+  throw new Error(`Missing required environment variables: ${missingEnvVars.join(', ')}. See README.md for more information.`)
+}
+
+
 module.exports = {
   NODE_ENV: process.env.NODE_ENV || 'dev',
   APPREG: {
