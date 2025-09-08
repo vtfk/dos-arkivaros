@@ -26,7 +26,6 @@ if (missingEnvVars.length > 0) {
   throw new Error(`Missing required environment variables: ${missingEnvVars.join(', ')}. See README.md for more information.`)
 }
 
-
 module.exports = {
   NODE_ENV: process.env.NODE_ENV || 'dev',
   APPREG: {
