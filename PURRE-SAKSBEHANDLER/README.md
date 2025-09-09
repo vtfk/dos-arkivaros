@@ -1,5 +1,7 @@
 # Flyt
 
+PROMP
+
 TO TING:
 1. Ubesvarte dokumenter i avdelingen - bør vel være innkommende dokumenter som ikke har noen "besvarelse", ikke avskrevet på et eller annet vis sikkert?
 2. Reserverte dokumenter eldre enn 1 mnd - må ha på et dato filter
