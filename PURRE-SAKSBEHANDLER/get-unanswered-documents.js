@@ -1,8 +1,18 @@
 // @ts-check
-(async () => {
-  const { callArchive } = require('../lib/call-archive')
-  const { NODE_ENV } = require('../config.js')
-  const { writeFileSync } = require('fs')
+
+const { callArchive } = require('../lib/call-archive')
+const { NODE_ENV } = require('../config.js')
+
+/**
+ * @param {string} fromDate YYYY-MM-DD
+ * @param {string} toDate YYYY-MM-DD
+ * @returns {Promise<import('./typeshit.js').ArchiveDocument[]>}
+ */
+const getUnansweredDocuments = async (fromDate, toDate) => {
+  // Den under er sånn rimelig validert og gitt mot restanseliste (y)
+  if (isNaN(new Date(fromDate).getTime())) throw new Error('Invalid fromDate')
+  if (isNaN(new Date(toDate).getTime())) throw new Error('Invalid toDate')
+  if (new Date(fromDate) >= new Date(toDate)) throw new Error('fromDate must be before toDate')
 
   const psychoPayload = {
     service: 'DocumentService',
@@ -10,17 +20,17 @@
     parameter: {
       IncludeFiles: false,
       IncludeDocumentContacts: true,
-      IncludeCustomFields: true, // For å se litt mer, kan skru av i prod
+      IncludeCustomFields: NODE_ENV !== 'production', // For å se litt mer, kan skru av i prod
       DateCriteria: [
         {
           DateName: 'JournalDate',
-          Operator: 'LT',
-          DateValue: '2024-02-01'
+          Operator: 'GT',
+          DateValue: fromDate
         },
         {
           DateName: 'JournalDate',
-          Operator: 'GT',
-          DateValue: '2024-01-01'
+          Operator: 'LT',
+          DateValue: toDate
         }
       ],
       AdditionalListFields: [
@@ -90,11 +100,9 @@
     }
   }
 
-  try {
-    const response = await callArchive('/archive', psychoPayload)
-    console.log('Response:', response.length, 'documents')
-    writeFileSync('./PURRE-SAKSBEHANDLER/ignore/ubesvart_drit.json', JSON.stringify(response, null, 2))
-  } catch (error) {
-    console.error('Error calling archive:', error)
-  }
-})()
+  const response = await callArchive('archive', psychoPayload)
+  return response
+}
+
+module.exports = { getUnansweredDocuments }
+

@@ -12,7 +12,14 @@ Jeg gjetter på kriteriet "dokument inn" (kan hende vi også trenger flere, f.ek
 - Må også filtrere vekk "Utgår" dokumenter
 - Kan også filtrere vekk dokumenter fra "Import arkiv" (uregistrerte)
 
-- Vi må også ha leder for avdelingen for å sende e-post. Må hente users med lederrolle og hvilken enhet de er leder for, og deretter matche mot alle dokumentene
+- Vi må også ha leder for avdelingen for å sende e-post. Må hente users med lederrolle og hvilken enhet de er leder for, og deretter matche mot alle dokumentene. Om login ikke er gyldig epost, må vi hente kontakten og epost fra kontaktpersonen. Om ikke epost er der, så får vi varsle arkiv. Varsle om en enhet ikke har leder heller.
+
+OBS OBS OSBSSBSBS, burde ikke ansvarlig person få e-post i stedet for avdelingsleder der det er en ansvarlig person (evt også varsel til avdelingsleder om at epost er sendt til ansvarlig) hvem skal følge opp liksom
+
+Flyt
+- Hent alle brukere - filtrer til ledere (rolle=3) og hvilket enterprise recno de er leder for
+	- Må også filtrere ut inaktive brukere da. Må gjøres i etterkant da det ikke går i spørring ifølge sif-dok.
+- Hent alle restanse-dokumenter.
 
 API-spørring kan da f.eks være
 ```json
@@ -192,3 +199,7 @@ API-spørring kan da f. eks være
 	}
 }
 ```
+
+
+OBS OBS. Hvis internt notat med oppfølginng er det MOTTAKER som skal få epost, ikke ansvarlig person eller virksomhet
+De med ikke aktiv bruker skal til ARKIV og ikke til leder.

@@ -57,5 +57,11 @@ module.exports = {
     IGNORE_UNITS,
     IGNORE_UNIT_LEADERS
   },
+  PURRE: {
+    VALID_EMAIL_SUFFIX: process.env.PURRE_VALID_EMAIL_SUFFIX || '@vestfoldfylke.no',
+    USE_CACHED_RESPONSE: process.env.PURRE_USE_CACHED_RESPONSE === 'true' || false,
+    ARCHIVE_EMAIL: process.env.PURRE_ARCHIVE_EMAIL || 'arkiv@vestfoldfylke.no',
+    LOCATOR_BASE_URL: process.env.PURRE_LOCATOR_BASE_URL || 'https://haha-glemt-i-env.public360online.com'
+  },
   TEAMS_STATUS_WEBHOOK_URLS: (process.env.TEAMS_STATUS_WEBHOOK_URLS && (process.env.TEAMS_STATUS_WEBHOOK_URLS.split(','))) || []
 }
