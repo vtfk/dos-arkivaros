@@ -32,6 +32,15 @@
  */
 
 /**
+ * @typedef {Object} ArchiveDocumentContact
+ * @property {?string} Role
+ * @property {?string} ContactRecno
+ * @property {?string} Email
+ * @property {"Virksomhet" | "Kontaktperson"} ContactType
+ * @property {?string} SearchName
+ */
+
+/**
  * @typedef {Object} ArchiveDocument
  * @property {number} Recno
  * @property {string} DocumentNumber
@@ -41,13 +50,13 @@
  * @property {string} DocumentDate
  * @property {string} JournalDate
  * @property {Object} Category
- * @property {string} Category.name
- * @property {string} Category.code
- * @property {string} Category.description
+ * @property {string} Category.Recno
+ * @property {string} Category.Code
+ * @property {string} Category.Description
  * @property {Object} Type
- * @property {string} Type.name
- * @property {string} Type.code
- * @property {string} Type.description
+ * @property {string} Type.Recno
+ * @property {string} Type.Code
+ * @property {string} Type.Description
  * @property {string} StatusCode
  * @property {string} StatusDescription
  * @property {string} AccessCodeDescription
@@ -56,6 +65,7 @@
  * @property {?ArchiveResponsibleEnterprise} ResponsibleEnterprise
  * @property {?ArchiveResponsiblePerson} ResponsiblePerson
  * @property {?string} ResponsiblePersonName
+ * @property {ArchiveDocumentContact[]} Contacts
  * @property {?string} AccessGroup
  * @property {string} URL
  */
@@ -67,33 +77,49 @@
  */
 
 /**
- * @typedef {Object} AlertResponsiblePerson
- * @property {string} email
- * @property {string} name
- * @property {?number} recno
- * @property {boolean} isActive
- * @property {boolean} isInternal
- * @property {boolean} isServiceUser
- */
-
-/**
- * @typedef {Object} AlertData
- * @property {string} key
+ * @typedef {Object} EmailToResult
  * @property {string[]} emailTo
  * @property {boolean} sendToLeaders
  * @property {boolean} sendToArchive
+ */
+
+/**
+ * @typedef {Object} DocumentReason
+ * @property {string} code
+ * @property {string} reportDescription
+ * @property {string} purreDescription
+ * @property {"INFO" | "WARNING"} level
+ */
+
+/**
+ * @typedef {Object} DocumentResults
+ * @property {DocumentReason} reason
+ * @property {ArchiveDocument} document
+ */
+
+/**
+ * @typedef {Object} GetUserResult
+ * @property {ArchiveUser} [user]
+ * @property {?string} email
+ * @property {?string} name
+ * @property {boolean} canSend
  * @property {string} reason
- * @property {AlertResponsiblePerson} responsiblePerson
+ */
+
+/**
+ * @typedef {Object} UnansweredPurreData
+ * @property {EmailToResult} emailToResult
+ * @property {?GetUserResult} responsibleForFollowUp
  * @property {EmailStatus} emailStatus
- * @property {ArchiveDocument[]} documents
+ * @property {DocumentResults[]} documentResults
  */
 
 /**
  * @typedef {Object} Enterprise
  * @property {string} name
- * @property {number} recno
+ * @property {string | number} recno
  * @property {import('./get-leaders').LeaderBase[]} leaders
- * @property {Object<string, AlertData>} alerts
+ * @property {Object<string, UnansweredPurreData>} alerts
  */
 
 /**
