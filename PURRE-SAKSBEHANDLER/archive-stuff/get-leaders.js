@@ -1,8 +1,8 @@
 // @ts-check
 
-const { PURRE } = require('../config')
-const { userProfileIsActive } = require('../lib/archive-helpers')
-const { callArchive } = require('../lib/call-archive')
+const { PURRE } = require('../../config')
+const { userProfileIsActive } = require('../../lib/archive-helpers')
+const { callArchive } = require('../../lib/call-archive')
 const { logger } = require('@vtfk/logger')
 
 /**
@@ -17,7 +17,7 @@ const { logger } = require('@vtfk/logger')
 */
 
 /**
- * @typedef {{ enterpriseWithLeaders: EnterprisesWithLeader, users: import('./typeshit').ArchiveUser[] }} EnterprisesWithLeadersResult
+ * @typedef {{ enterpriseWithLeaders: EnterprisesWithLeader, users: import('../typeshit').ArchiveUser[] }} EnterprisesWithLeadersResult
  */
 
 /**
@@ -30,7 +30,7 @@ const getEnterprisesWithLeaders = async () => {
     method: 'GetUsers',
     parameter: {}
   }
-  /** @type {import('./typeshit').ArchiveUser[]} */
+  /** @type {import('../typeshit').ArchiveUser[]} */
   const response = await callArchive('archive', usersPayload)
   logger('info', [`Got ${response.length} users from archive`])
   const leaders = response.filter(user => {
