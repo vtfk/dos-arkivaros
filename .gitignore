@@ -141,3 +141,6 @@ ignore-unit-leaders.txt
 
 # Elevmappe sync view permissions
 ELEVMAPPE-VIEW-PERMISSIONS/data/*
+
+# Mac
+.DS_Store
