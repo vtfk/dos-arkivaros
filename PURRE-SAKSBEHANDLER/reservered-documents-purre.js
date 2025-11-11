@@ -1,14 +1,11 @@
 // @ts-check
 
 const { logger } = require('@vtfk/logger')
-const { writeFileSync } = require('fs')
-const { reservedDocumentsReportMailToArchive } = require('./email-stuff/email-templates')
 const { getArchiveResponsibles } = require('./archive-stuff/archive-responsibles')
 const { createPurreReceiver } = require('./purre')
 const { ArchiveDocument } = require('../lib/archive-types')
 const { DocumentPurre, PurreDocumentsReport } = require('./purre-types')
 const { batchedGetReservedDocuments } = require('./archive-stuff/get-reserved-documents')
-const { sendReportMails } = require('./email-stuff/send-mail')
 
 
 /**
@@ -25,7 +22,9 @@ const reservedDocumentsPurre = async (fromDate, toDate) => {
   }
 
   const archiveResponsibles = await getArchiveResponsibles()
+  logger('info', ['Fetching reserved documents from archive between dates', fromDate, 'and', toDate])
   const reservedDocuments = await batchedGetReservedDocuments(fromDate, toDate)
+  logger('info', [`Fetched ${reservedDocuments.length} reserved documents from archive`])
 
   /**
    *
@@ -131,6 +130,7 @@ const reservedDocumentsPurre = async (fromDate, toDate) => {
     purreReceivers: []
   })
 
+  logger('info', ['Processing reserved documents and creating report'])
   // Gå gjennom alle dokumenter og lag rapport 👍
   for (const document of reservedDocuments) {
     const documentPurre = createPurreFromDocument(document)
@@ -156,13 +156,9 @@ const reservedDocumentsPurre = async (fromDate, toDate) => {
     // Legg til dokumentresultatet i riktig receiver
     purreReceiver.documentResults.push(documentPurre.documentResult)
   }
+  logger('info', ['Finished processing reserved documents and creating report, returning report'])
 
-  writeFileSync('./PURRE-SAKSBEHANDLER/ignore/reservert-rapport.json', JSON.stringify(reservedDocumentsReport, null, 2))
-  // Send ut driten og lag en rapport til arkiv
-  const reportWithStatus = await sendReportMails(reservedDocumentsReport, 'reserved-documents')
-  const balls = reservedDocumentsReportMailToArchive(reportWithStatus)
-  const b64 = Buffer.from(balls).toString('base64')
-  writeFileSync('./PURRE-SAKSBEHANDLER/ignore/reservert-report-to-archive.html', balls)
+  return reservedDocumentsReport
 }
 
 module.exports = { reservedDocumentsPurre }
