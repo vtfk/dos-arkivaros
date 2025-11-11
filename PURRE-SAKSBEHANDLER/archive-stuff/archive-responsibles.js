@@ -1,40 +1,11 @@
 // @ts-check
 
-/*
-
-Lager en gærning som henter brukere og enterprises, sånn at man kan få riktige ansvarlige med data fra arkivet, og om man kan sende til de osv
-// Kan vi hente interne virksomheter og matche med enterprise recno på brukerprofiler?
-// Kan vi hente interne kontakter og matche med contact recno på brukerprofiler?
-
-const users = null
-const enterprises = null
-
-const getUser = (recno) => {
-  if (!users) hent og ordne users
-  finn bruker og returner med en eller annen grunn
-}
-
-const getEnterprise = (recno) => {
-  if (!enterprises) hent og ordne enterprises
-  finn enterprise og returner sammen med ledere og greier
-}
-
-const archiveResponsibles = async () => {
-  // sett opp hele røkla
-  returner {
-    getUser,
-    getEnterprise
-  }
-}
-
-*/
-
 const { logger } = require("@vtfk/logger")
 const { default: z } = require("zod")
 const { callArchive } = require("../../lib/call-archive")
 const { userProfileIsActive } = require("../../lib/archive-helpers")
 const { PURRE, NODE_ENV } = require("../../config")
-const { writeFileSync, readFileSync, existsSync } = require("fs")
+const { writeFileSync, readFileSync, existsSync, mkdirSync } = require("fs")
 const { ArchiveContact, ArchiveContacts, ArchiveEnterprise, ArchiveEnterprises, ArchiveUser, ArchiveUsers } = require("../../lib/archive-types")
 
 
@@ -90,6 +61,9 @@ const getArchiveResponsibles = async () => {
       method: 'GetUsers',
       parameter: {}
     }
+    if (PURRE.USE_CACHED_RESPONSE && !existsSync('./PURRE-SAKSBEHANDLER/ignore/response-cache')) {
+      mkdirSync('./PURRE-SAKSBEHANDLER/ignore/response-cache', { recursive: true })
+    }
     const usersCachePath = `./PURRE-SAKSBEHANDLER/ignore/response-cache/archive-users-${NODE_ENV}.json`
     // @ts-ignore
     const usersResponse = PURRE.USE_CACHED_RESPONSE && existsSync(usersCachePath) ? JSON.parse(readFileSync(usersCachePath)) : await callArchive('archive', usersPayload)
@@ -129,9 +103,10 @@ const getArchiveResponsibles = async () => {
     const archiveEnterprises = ArchiveEnterprises.parse(enterprisesResponse)
     logger('info', [`Got ${archiveEnterprises.length} enterprises from archive, caching all data for future use`])
 
+    
     responsibles.users = archiveUsers.map(user => {
       const contact = archiveContacts.find(c => c.Recno === user.ContactRecno) || null
-      if (!contact) {
+      if (!contact && !PURRE.IGNORE_LOGINS.includes(user.Login)) {
         logger('warn', [`Could not find contact for user with login ${user.Login} and contact recno ${user.ContactRecno}`])
         return { user, contact: null }
         // throw new Error(`Could not find contact for user with login ${user.Login} and contact recno ${user.ContactRecno}`)

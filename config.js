@@ -64,7 +64,8 @@ module.exports = {
     LOCATOR_BASE_URL: process.env.PURRE_LOCATOR_BASE_URL || 'https://haha-glemt-i-env.public360online.com',
     MAIL_SENDER: process.env.PURRE_MAIL_SENDER || 'noreply@fylke.no',
     MAIL_TEMPLATE: process.env.PURRE_MAIL_TEMPLATE || 'default-template',
-    TEST_MAIL_RECEIVER: process.env.PURRE_TEST_MAIL_RECEIVER
+    TEST_MAIL_RECEIVER: process.env.PURRE_TEST_MAIL_RECEIVER,
+    IGNORE_LOGINS: (process.env.PURRE_IGNORE_LOGINS && (process.env.PURRE_IGNORE_LOGINS.split(','))) || []
   },
   TEAMS_STATUS_WEBHOOK_URLS: (process.env.TEAMS_STATUS_WEBHOOK_URLS && (process.env.TEAMS_STATUS_WEBHOOK_URLS.split(','))) || []
 }
