@@ -6,6 +6,7 @@ const { default: z } = require('zod')
 const { createPurreReceiver } = require('./purre')
 const { ArchiveDocument } = require('../lib/archive-types')
 const { DocumentPurre, PurreDocumentsReport } = require('./purre-types')
+const { logger } = require('@vtfk/logger')
 
 
 /**
@@ -235,6 +236,11 @@ const unansweredDocumentsPurre = async (fromDate, toDate) => {
 
   // Gå gjennom alle dokumenter og lag rapport 👍
   for (const document of unansweredDocuments) {
+    // Dritt-greie som jeg ikke gidder gjøre mer med enn dette akkurat nå (service accounts som responsible enterprise)
+    if (document.ResponsibleEnterprise.Recno === 3) {
+      logger('warn', [`Skipping document ${document.DocumentNumber} because responsible enterprise is service account`])
+      continue
+    }
     const documentPurre = createPurreFromDocument(document)
     // Sjekk om vi har lagt den inn i purreReceivers allerede
     let purreReceiver
