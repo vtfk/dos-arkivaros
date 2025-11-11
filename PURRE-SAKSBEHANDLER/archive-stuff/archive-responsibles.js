@@ -131,7 +131,6 @@ const getArchiveResponsibles = async () => {
   } else {
     logger('info', ['We have data in memoory already, just using that'])
   }
-  writeFileSync('./PURRE-SAKSBEHANDLER/ignore/responsibles-cache.json', JSON.stringify(responsibles, null, 2))
   
   /**
    * 
