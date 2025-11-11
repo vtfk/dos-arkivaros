@@ -96,8 +96,8 @@ const sendReportMails = async (purreReport, type) => {
       type: 'text/html',
     }
   ]
+  const reportReceivers = PURRE.TEST_MAIL_RECEIVER ? [PURRE.TEST_MAIL_RECEIVER] : [PURRE.ARCHIVE_MAIL_RECEIVER]
   try {
-    const reportReceivers = PURRE.TEST_MAIL_RECEIVER ? [PURRE.TEST_MAIL_RECEIVER] : [PURRE.ARCHIVE_MAIL_RECEIVER]
     logger('info', [`Sending archive report mail for ${type} to ${reportReceivers.join(', ')}`])
     await sendPurreMail(
       reportReceivers,
