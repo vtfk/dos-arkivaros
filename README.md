@@ -44,5 +44,6 @@ PURRE_LOCATOR_BASE_URL="base url til 360 frontend"
 PURRE_MAIL_SENDER="avsender-adresse på epostene"
 PURRE_MAIL_TEMPLATE="template (fra mail api) for epostene"
 PURRE_TEST_MAIL_RECEIVER="en mailadresse" # bare hvis du tester, og ikke vil at mail skal gå ut til noen andre enn denne eposten
+PURRE_IGNORE_LOGINS="comma separated list of usernames (login property) which doesnt need warning if contact doesnt exist (typically system users)"
 NODE_ENV="dev || test || production"
 ```
