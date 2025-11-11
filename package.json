@@ -23,7 +23,7 @@
   "dependencies": {
     "@azure/identity": "^4.11.1",
     "@vtfk/logger": "^6.3.4",
-    "zod": "^4.1.12"
+    "zod": "^4.1.12",
     "axios": "^1.12.2",
     "dotenv": "^16.3.1"
   }
