@@ -7,7 +7,7 @@ const { GetResponsibleUserResult, ResponsibleEnterprise } = require("./archive-s
 /** @typedef {z.infer<typeof PurreResult>} */
 const PurreResult = z.enum(["send_to_archive", "send_to_leaders", "send_to_responsible"]);
 
-/** @typedef {z.infer<typeof PurreResult>} */
+/** @typedef {z.infer<typeof PurreDocumentResult>} */
 const PurreDocumentResult = z.object({
   document: ArchiveDocument,
   reason: z.object({
@@ -28,10 +28,10 @@ const PurreInput = z.object({
 /** @typedef {z.infer<typeof EmailResult>} */
 const EmailResult = z.object({
   emailId: z.string().nullable(),
-  status: z.enum(['NOT_SENT', 'SENT', 'FAILED']),
+  status: z.enum(['IKKE_SENDT', 'SENDT', 'FEILET']),
 }).default({
   emailId: null,
-  status: 'NOT_SENT'
+  status: 'IKKE_SENDT'
 })
 
 /** @typedef {z.infer<typeof PurreReceiver>} */
@@ -45,8 +45,8 @@ const PurreReceiver = z.object({
   emailResult: EmailResult
 })
 
-/** @typedef {z.infer<typeof UnansweredDocumentsReport>} */
-const UnansweredDocumentsReport = z.object({
+/** @typedef {z.infer<typeof PurreDocumentsReport>} */
+const PurreDocumentsReport = z.object({
   /** Journaldato fra */
   fromDate: z.iso.date(),
   toDate: z.iso.date(),
@@ -66,6 +66,6 @@ module.exports = {
   PurreInput,
   EmailResult,
   PurreReceiver,
-  UnansweredDocumentsReport,
+  PurreDocumentsReport,
   DocumentPurre,
 }

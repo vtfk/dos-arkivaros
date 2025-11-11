@@ -3,13 +3,13 @@
 const { batchedGetUnansweredDocuments } = require('./archive-stuff/get-unanswered-documents')
 const { logger } = require('@vtfk/logger')
 const { writeFileSync } = require('fs')
-const { unansweredDocumentEmailTemplates } = require('./email-stuff/email-templates')
-const { sendPurreMail } = require('./email-stuff/send-mail')
+const { unansweredDocumentsReportMailToArchive } = require('./email-stuff/email-templates')
+const { sendReportMails } = require('./email-stuff/send-mail')
 const { getArchiveResponsibles } = require('./archive-stuff/archive-responsibles')
 const { default: z } = require('zod')
 const { createPurreReceiver } = require('./purre')
 const { ArchiveDocument } = require('../lib/archive-types')
-const { DocumentPurre, UnansweredDocumentsReport } = require('./purre-types')
+const { DocumentPurre, PurreDocumentsReport } = require('./purre-types')
 
 
 /**
@@ -230,7 +230,7 @@ const unansweredDocumentsPurre = async (fromDate, toDate) => {
     })
   }
 
-  const unansweredDocumentsReport = UnansweredDocumentsReport.parse({
+  const unansweredDocumentsReport = PurreDocumentsReport.parse({
     fromDate,
     toDate,
     totalDocuments: unansweredDocuments.length,
@@ -265,11 +265,11 @@ const unansweredDocumentsPurre = async (fromDate, toDate) => {
 
   writeFileSync('./PURRE-SAKSBEHANDLER/ignore/rappooort.json', JSON.stringify(unansweredDocumentsReport, null, 2))
   // Send ut driten og lag en rapport til arkiv
-  const balls = unansweredDocumentEmailTemplates.reportMailToArchive(unansweredDocumentsReport)
+  const reportWithStatus = await sendReportMails(unansweredDocumentsReport, 'unanswered-documents')
+  const balls = unansweredDocumentsReportMailToArchive(reportWithStatus)
   const b64 = Buffer.from(balls).toString('base64')
   writeFileSync('./PURRE-SAKSBEHANDLER/ignore/report-to-archive-ny.html', balls)
 
-
 }
 
-module.exports = { unansweredDocumentsPurre, UnansweredDocumentsReport }
+module.exports = { unansweredDocumentsPurre }

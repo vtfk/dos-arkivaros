@@ -4,6 +4,7 @@
   const { logger, logConfig } = require('@vtfk/logger')
   const { createLocalLogger } = require('../lib/local-logger')
   const { unansweredDocumentsPurre } = require('./unanswered-documents-purre')
+  const { reservedDocumentsPurre } = require('./reservered-documents-purre')
 
 
   // Først setter vi opp litt logging
@@ -23,4 +24,5 @@
   const toDate = '2025-09-30'
 
   await unansweredDocumentsPurre(fromDate, toDate)
+  await reservedDocumentsPurre(fromDate, toDate)
 })()

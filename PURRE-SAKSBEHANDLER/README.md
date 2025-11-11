@@ -200,6 +200,4 @@ API-spørring kan da f. eks være
 }
 ```
 
-
-OBS OBS. Hvis internt notat med oppfølginng er det MOTTAKER som skal få epost, ikke ansvarlig person eller virksomhet
-De med ikke aktiv bruker skal til ARKIV og ikke til leder.
+Sikkert masse greier med de der og... Får lage et utgangspunkt likt den andre - gå gjennom alle dokumenter, sjekk hvem som skal få purre, legg dokumentene på en nøkkel knyttet til mottaker(e) av epost.
