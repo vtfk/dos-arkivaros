@@ -16,6 +16,3 @@ Til slutt sendes en rapport til arkiv over hva som er sendt ut
 
 ## Hva gjenstår
 - Sett riktige mottakere på utsending av mail når alt er godkjent av arkiv
-
-
-
