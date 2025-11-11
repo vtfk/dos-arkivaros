@@ -26,7 +26,6 @@ if (missingEnvVars.length > 0) {
   throw new Error(`Missing required environment variables: ${missingEnvVars.join(', ')}. See README.md for more information.`)
 }
 
-
 module.exports = {
   NODE_ENV: process.env.NODE_ENV || 'dev',
   APPREG: {
@@ -57,6 +56,15 @@ module.exports = {
     MAIL_TEMPLATE: process.env.ORG_SYNC_MAIL_TEMPLATE,
     IGNORE_UNITS,
     IGNORE_UNIT_LEADERS
+  },
+  PURRE: {
+    VALID_EMAIL_SUFFIX: process.env.PURRE_VALID_EMAIL_SUFFIX || '@vestfoldfylke.no',
+    USE_CACHED_RESPONSE: process.env.PURRE_USE_CACHED_RESPONSE === 'true' || false,
+    ARCHIVE_EMAIL: process.env.PURRE_ARCHIVE_EMAIL || 'arkiv@vestfoldfylke.no',
+    LOCATOR_BASE_URL: process.env.PURRE_LOCATOR_BASE_URL || 'https://haha-glemt-i-env.public360online.com',
+    MAIL_SENDER: process.env.PURRE_MAIL_SENDER || 'noreply@fylke.no',
+    MAIL_TEMPLATE: process.env.PURRE_MAIL_TEMPLATE || 'default-template',
+    TEST_MAIL_RECEIVER: process.env.PURRE_TEST_MAIL_RECEIVER
   },
   TEAMS_STATUS_WEBHOOK_URLS: (process.env.TEAMS_STATUS_WEBHOOK_URLS && (process.env.TEAMS_STATUS_WEBHOOK_URLS.split(','))) || []
 }

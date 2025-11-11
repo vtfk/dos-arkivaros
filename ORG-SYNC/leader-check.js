@@ -1,6 +1,7 @@
 const { logger } = require('@vtfk/logger')
 const { callArchive } = require('../lib/call-archive')
 const { ORG_SYNC } = require('../config')
+const { userProfileIsActive } = require('../lib/archive-helpers')
 
 /*
 - Henter alle users fra P360
@@ -17,9 +18,9 @@ const leaderCheck = async (unitsToCheck) => {
     parameter: {}
   }
   const archiveUsers = await callArchive('archive', enterprisePayload)
-  const archiveLeaderUsers = archiveUsers.filter(user => user.IsActive && user.Profiles.some(profile => profile.Role === '3')) // Active user and Profile with Role 3 (Leader)
+  const archiveLeaderUsers = archiveUsers.filter(user => user.IsActive && user.Profiles.some(profile => profile.Role === '3' && userProfileIsActive(profile))) // Active user and Profile with Role 3 (Leader)
   const archiveLeaders = archiveLeaderUsers.map(user => {
-    const LeaderForEnterpriseRecnos = user.Profiles.filter(profile => profile.Role === '3').map(profile => profile.EnterpriseRecno)
+    const LeaderForEnterpriseRecnos = user.Profiles.filter(profile => profile.Role === '3' && userProfileIsActive(profile)).map(profile => profile.EnterpriseRecno)
     return {
       Login: user.Login,
       ContactRecno: user.ContactRecno,

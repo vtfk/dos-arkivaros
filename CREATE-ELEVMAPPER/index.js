@@ -4,14 +4,13 @@
   const inputList = require('./input.json') // Legg inn sti til det du trenger
   const timeoutInterval = 0 // Seconds
   const outputListPath = './CREATE-ELEVMAPPER/failed.json'
-  
+
   /* END USER CONFIG */
 
   const { callArchive } = require('../lib/call-archive')
   const { logger, logConfig } = require('@vtfk/logger')
   const { writeFileSync } = require('fs')
   const { createLocalLogger } = require('../lib/local-logger')
-
 
   logConfig({
     prefix: 'CREATE-ELEVMAPPER',
@@ -20,7 +19,7 @@
 
   const sleep = (ms) => {
     return new Promise((resolve) => {
-      setTimeout(resolve, ms);
+      setTimeout(resolve, ms)
     })
   }
 
