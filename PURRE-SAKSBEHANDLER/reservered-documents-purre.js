@@ -78,23 +78,23 @@ const reservedDocumentsPurre = async (fromDate, toDate) => {
         }
       })
     }
-    // Hvis vi har kommet hit, og har noen ledere for virksomheten, så sender vi til dem
+    // Hvis vi har kommet hit, og har noen ledere for virksomheten, så skal vi ALLIKEVEL sende til arkiv, fordi det ville arkiv
     if (documentResponsibleUnit.leaders.length > 0) {
       const customReason = !document.ResponsiblePerson || (!document.ResponsiblePerson.UserId && document.ResponsiblePerson.Recno.toString() === document.ResponsibleEnterprise?.Recno.toString()) ?
         {
           code: 'NO_RESPONSIBLE_PERSON',
-          reportDescription: `Ingen ansvarlig person satt, sender til leder(e) for ansvarlig enhet i stedet.`,
-          purreDescription: 'Ingen ansvarlig person satt på dokumentet. Du er registrert som leder for ansvarlig enhet, og får derfor denne påminnelsen.',
+          reportDescription: `Ingen ansvarlig person satt, må håndteres av arkiv.`,
+          purreDescription: 'Ingen ansvarlig person satt på dokumentet.',
           level: 'INFO'
         } : {
           code: 'RESPONSIBLE_PERSON_INVALID',
-          reportDescription: `${docReasonPrefix} Sender til leder(e) for ansvarlig enhet i stedet.`,
+          reportDescription: `${docReasonPrefix} Må håndteres av arkiv.`,
           purreDescription: docReasonPrefix,
           level: 'WARNING'
         }
       return DocumentPurre.parse({
         receiver: createPurreReceiver({
-          purreResult: 'send_to_leaders',
+          purreResult: 'send_to_archive',
           responsibleEnterprise: documentResponsibleUnit,
           responsibleForFollowUp: null
         }),
@@ -115,7 +115,7 @@ const reservedDocumentsPurre = async (fromDate, toDate) => {
         document,
         reason: {
           code: 'NO_RESPONSIBLE_PERSON_OR_LEADERS',
-          reportDescription: `${docReasonPrefix} Ingen ledere funnet for ansvarlig enhet, må håndteres av arkiv`,
+          reportDescription: `${docReasonPrefix} Ingen ansvarlig person funnet, må håndteres av arkiv`,
           purreDescription: docReasonPrefix,
           level: 'WARNING'
         }

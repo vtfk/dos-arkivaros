@@ -131,9 +131,9 @@ const sendPurreMail = async (to, subject, body, attachments = []) => {
       templateData: {
         body,
         signature: {
-          name: 'Arkiveringsroboten',
-          title: 'Robot',
-          company: 'Robotavdelingen'
+          name: 'Seksjon dokumentasjon og politisk støtte',
+          title: 'Fagenhet dokumentasjon',
+          company: `Brukerstøtte: 33 34 40 07 (betjent kl 10.00 - 14.00) \n E-post: arkiv${PURRE.VALID_EMAIL_SUFFIX}`
         }
       }
     }

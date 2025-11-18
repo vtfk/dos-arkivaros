@@ -113,7 +113,7 @@ const unansweredPurreToSaksbehandler = (alert) => {
   mailStr += `<p>Hei, ${name}!</p>\n`
   mailStr += `<strong>Les dette før du følger opp dokumentene:</strong><br />\n`
   mailStr += `Det er mulig du allerede har fulgt opp disse dokumentene, men ikke avskrevet de i Public 360. Sjekk derfor først om du har svart på dokumentet, eller fulgt opp på annen måte. Hvis du har gjort det, så avskriv dokumentet i Public 360 med korrekt avskrivningskode. Dersom dokumentet ikke er besvart eller håndtert, må det følges opp.<br />\n`
-  mailStr += 'Har du spørsmål, ta kontakt med din leder eller arkivet.<br /><br />\n'
+  mailStr += 'Har du spørsmål, ta kontakt med din leder eller arkivtjenesten.<br /><br />\n'
   mailStr += `<strong>Dokumenter som trenger oppfølging:</strong><br />\n`
   mailStr += createListOfDocuments(alert.documentResults)
 
@@ -129,8 +129,8 @@ const unansweredPurreToLedere = (alert) => {
   alert = PurreReceiver.parse(alert)
   let mailStr = ''
   mailStr += `<p>Hei, ledere for ${alert.responsibleEnterprise.enterprise.Name || 'ukjent virksomhet'}!</p>\n`
-  mailStr += `Her er en liste over dokumenter i deres avdeling som trenger oppfølging, da de enten mangler ansvarlig person eller ansvarlig person ikke kan brukes. Dokumentene må enten fordeles til korrekt saksbehandler, avskrives (dersom de er håndtert), eller følges opp.<br />\n`
-  mailStr += 'Har du spørsmål, ta kontakt med arkivet.<br /><br />\n'
+  mailStr += `Her er en liste over dokumenter i deres avdeling som trenger oppfølging. Dokumentene må fordeles til korrekt saksbehandler.<br />\n`
+  mailStr += 'Har du spørsmål, ta kontakt med arkivtjenesten.<br /><br />\n'
   mailStr += `<strong>Dokumenter som trenger oppfølging:</strong><br />\n`
   mailStr += createListOfDocuments(alert.documentResults)
 
@@ -148,8 +148,8 @@ const reservedPurreToSaksbehandler = (alert) => {
   const name = alert.responsibleForFollowUp?.contact ? `${alert.responsibleForFollowUp.contact.FirstName} ${alert.responsibleForFollowUp.contact.LastName}` : 'saksbehandler'
   mailStr += `<p>Hei, ${name}!</p>\n`
   mailStr += `<strong>Les dette før du følger opp dokumentene:</strong><br />\n`
-  mailStr += `Under ser du dine dokumenter under arbeid (status "Reservert") i Public 360. Vennligst fullfør dokumentet og sett til "Ferdig fra ansvarlig", eller forkast dokumentet ved å sette til status "Utgår".<br />\n`
-  mailStr += 'Har du spørsmål, ta kontakt med din leder eller arkivet.<br /><br />\n'
+  mailStr += `Under ser du dine dokumenter under arbeid (status "Reservert") i Public 360. Vennligst ekspeder dokumentet. Skal dokumentet utgå må du gi beskjed til arkivtjenesten.<br />\n`
+  mailStr += 'Har du spørsmål, ta kontakt med din leder eller arkivtjenesten.<br /><br />\n'
   mailStr += `<strong>Dine dokumenter under arbeid:</strong><br />\n`
   mailStr += createListOfDocuments(alert.documentResults)
 
@@ -165,8 +165,8 @@ const reservedPurreToLedere = (alert) => {
   alert = PurreReceiver.parse(alert)
   let mailStr = ''
   mailStr += `<p>Hei, ledere for ${alert.responsibleEnterprise.enterprise.Name || 'ukjent virksomhet'}!</p>\n`
-  mailStr += `Her er en liste over dokumenter i deres avdeling som er under arbeids (status "Reservert") I Public 360. Vennligst fordel dokumentet, eller fullfør dokumentet og sett til "Ferdig fra ansvarlig", eller forkast dokumentet ved å sette til status "Utgår".<br />\n`
-  mailStr += 'Har du spørsmål, ta kontakt med arkivet.<br /><br />\n'
+  mailStr += `Her er en liste over dokumenter i deres avdeling som er under arbeid (status "Reservert") I Public 360. Vennligst fordel dokumentet, eller fullfør dokumentet og sett til "Ferdig fra ansvarlig", eller forkast dokumentet ved å sette til status "Utgår".<br />\n`
+  mailStr += 'Har du spørsmål, ta kontakt med arkivtjenesten.<br /><br />\n'
   mailStr += `<strong>Dokumenter under arbeid i din avdeling:</strong><br />\n`
   mailStr += createListOfDocuments(alert.documentResults)
 

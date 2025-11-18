@@ -188,7 +188,7 @@ const unansweredDocumentsPurre = async (fromDate, toDate) => {
         {
           code: 'NO_RESPONSIBLE_PERSON',
           reportDescription: `Ingen ansvarlig person satt, sender til leder(e) for ansvarlig enhet i stedet.`,
-          purreDescription: 'Ingen ansvarlig person satt på dokumentet. Du er registrert som leder for ansvarlig enhet, og får derfor denne påminnelsen.',
+          purreDescription: 'Ingen ansvarlig person satt på dokumentet. Du er registrert som leder for denne enheten.',
           level: 'INFO'
         } : {
           code: 'RESPONSIBLE_PERSON_INVALID',
