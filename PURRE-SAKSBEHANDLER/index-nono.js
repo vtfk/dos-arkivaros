@@ -1,5 +1,6 @@
 // @ts-check
 
+
 (async () => {
   const { logger, logConfig } = require('@vtfk/logger')
   const { createLocalLogger } = require('../lib/local-logger')
@@ -8,6 +9,7 @@
   const { sendReportMails } = require('./email-stuff/send-mail')
   const { writeFileSync, existsSync, mkdirSync } = require('fs')
   const { logErrorAndExit } = require('./log-error')
+  const { reservedDocumentsReportMailToArchive, unansweredDocumentsReportMailToArchive } = require('./email-stuff/email-templates')
 
   // Først setter vi opp litt logging
   logConfig({
@@ -23,9 +25,14 @@
   logConfig({
     prefix: 'PURRE-UNANSWERED-DOCUMENTS'
   })
+
+  const now = new Date()
+  const threeWeeksAgo = new Date(now.setDate(now.getDate() - 21)) // haha
+  const threeWeeksAgoString = threeWeeksAgo.toISOString().split('T')[0]
+
   const unansweredDocumentsDates = {
     fromDate: '2024-01-01',
-    toDate: '2025-09-30' // hva skal denne være? Egt en mnd tilbake i tid fra dagens dato
+    toDate: threeWeeksAgoString // Tre uker tilbake i tid fra dagens dato
   }
   logger('info', [`Running unanswered documents purre for dates ${unansweredDocumentsDates.fromDate} to ${unansweredDocumentsDates.toDate}`])
   let unansweredDocumentsReport = null
@@ -52,6 +59,9 @@
       mkdirSync(backupDir, { recursive: true })
     }
     writeFileSync(`${backupDir}/unanswered-documents-report-${new Date().toISOString().split('T')[0]}.json`, JSON.stringify(unansweredReportWithStatus, null, 2))
+    // @ts-expect-error its not null
+    const htmlReport = unansweredDocumentsReportMailToArchive(unansweredReportWithStatus)
+    writeFileSync(`${backupDir}/unanswered-documents-report-${new Date().toISOString().split('T')[0]}.html`, htmlReport)
   } catch (error) {
     logErrorAndExit('Failed to backup unanswered documents report', error)
   }
@@ -59,9 +69,14 @@
   logConfig({
     prefix: 'PURRE-RESERVED-DOCUMENTS'
   })
+
+  const anotherNow = new Date()
+  const threeMonthsAgo = new Date(anotherNow.setMonth(anotherNow.getMonth() - 3))
+  const threeMonthsAgoString = threeMonthsAgo.toISOString().split('T')[0]
+
   const reservedDocumentsDates = {
     fromDate: '2024-01-01',
-    toDate: '2025-09-30' // Egt en mnd tilbake i tid fra dagens dato
+    toDate: threeMonthsAgoString // Tre måneder tilbake i tid fra dagens dato
   }
   logger('info', [`Running reserved documents purre for dates ${reservedDocumentsDates.fromDate} to ${reservedDocumentsDates.toDate}`])
   let reservedDocumentsReport = null
@@ -88,6 +103,9 @@
       mkdirSync(backupDir, { recursive: true })
     }
     writeFileSync(`${backupDir}/reserved-documents-report-${new Date().toISOString().split('T')[0]}.json`, JSON.stringify(reservedReportWithStatus, null, 2))
+    // @ts-expect-error its not null
+    const htmlReport = reservedDocumentsReportMailToArchive(reservedReportWithStatus)
+    writeFileSync(`${backupDir}/reserved-documents-report-${new Date().toISOString().split('T')[0]}.html`, htmlReport)
   } catch (error) {
     logErrorAndExit('Failed to backup reserved documents report', error)
   }

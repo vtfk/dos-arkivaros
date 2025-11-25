@@ -1,3 +1,5 @@
+// @ts-check
+
 const { default: axios } = require('axios')
 const { MAIL, PURRE } = require('../../config')
 const { logger } = require('@vtfk/logger')
@@ -55,7 +57,6 @@ const sendReportMails = async (purreReport, type) => {
       receivers.push(exampleToLeaders)
     }
   } else {
-    throw new Error('NOT READY DO ACTUALLY SEND MAILS WITHOUT TEST MAIL RECEIVER SET YET')
     receivers = purreReport.purreReceivers
   }
 
@@ -70,16 +71,25 @@ const sendReportMails = async (purreReport, type) => {
       logger('warn', ['No mail body generated for receiver', purreReceiver.receiverId, 'with purreResult', purreReceiver.purreResult])
       continue
     }
-    const toAddresses = PURRE.TEST_MAIL_RECEIVER ? [PURRE.TEST_MAIL_RECEIVER] : 'neinei'
-    // Hvis saksbehandler, send til sakbehandler og ledere eller arkiv på kopi
-    // Hvis ledere, send til ledere og arkiv på kopi
+
+    if (PURRE.TEST_MAIL_RECEIVER) {
+      logger('info', [`TEST MAIL RECEIVER IS SET TO ${PURRE.TEST_MAIL_RECEIVER}, overriding to-addresses ${purreReceiver.toAddresses.join(', ')} and cc-addresses ${purreReceiver.ccAddresses.join(', ')}`])
+    }
+
+    const toAddresses = PURRE.TEST_MAIL_RECEIVER ? [PURRE.TEST_MAIL_RECEIVER] : purreReceiver.toAddresses
+    const ccAddresses = PURRE.TEST_MAIL_RECEIVER ? [PURRE.TEST_MAIL_RECEIVER] : purreReceiver.ccAddresses
+
     try {
       logger('info', [`Sending ${type} purre-mail to ${toAddresses.join(', ')} (${purreReceiver.purreResult})`])
-      await sendPurreMail(toAddresses, mailSubject, mailBody)
+      const mailResult = await sendPurreMail(toAddresses, mailSubject, mailBody, [], ccAddresses, [])
       purreReceiver.emailResult.status = 'SENDT'
+      purreReceiver.emailResult.emailResponse = mailResult
       logger('info', [`Sucessfully sent ${type} purre-mail to ${toAddresses.join(', ')} (${purreReceiver.purreResult})`])
     } catch (error) {
       purreReceiver.emailResult.status = 'FEILET'
+      // @ts-expect-error gidder ikke
+      purreReceiver.emailResult.error = error.response?.data || error.toString()
+      // @ts-expect-error gidder ikke
       logger('error', [`Failed to send purre mail to ${toAddresses.join(', ')}`, error.response?.data || error.stack || error.toString()])
     }
   }
@@ -96,30 +106,42 @@ const sendReportMails = async (purreReport, type) => {
       type: 'text/html',
     }
   ]
-  const reportReceivers = PURRE.TEST_MAIL_RECEIVER ? [PURRE.TEST_MAIL_RECEIVER] : [PURRE.ARCHIVE_MAIL_RECEIVER]
+  const reportReceivers = PURRE.TEST_MAIL_RECEIVER ? [PURRE.TEST_MAIL_RECEIVER] : [PURRE.ARCHIVE_EMAIL]
   try {
     logger('info', [`Sending archive report mail for ${type} to ${reportReceivers.join(', ')}`])
     await sendPurreMail(
       reportReceivers,
       archiveMailSubject,
       archiveMailBody,
-      attachments
+      attachments,
+      [],
+      PURRE.REPORT_BCCS
     )
     logger('info', [`Sucessfully sent archive report mail for ${type} to ${reportReceivers.join(', ')}`])
   } catch (error) {
+    // @ts-expect-error gidder ikke
     logger('error', [`Failed to send archive report mail for ${type} to ${reportReceivers.join(', ')}`, error.response?.data || error.stack || error.toString()])
   }
 
   return purreReport
 }
 
-
-const sendPurreMail = async (to, subject, body, attachments = []) => {
+/**
+ * 
+ * @param {string[]} to 
+ * @param {string} subject 
+ * @param {string} body 
+ * @param {Object[]} attachments 
+ * @param {string[]} cc 
+ * @param {string[]} bcc 
+ * @returns {Promise<{[key: string]: string}>} Response data from mail function
+ */
+const sendPurreMail = async (to, subject, body, attachments = [], cc, bcc) => {
   if (!to || !subject || !body) {
     throw new Error('Missing to, subject or body when sending purre mail')
   }
   if (PURRE.TEST_MAIL_RECEIVER && to.length !== 1 && to[0] !== PURRE.TEST_MAIL_RECEIVER) {
-    throw new Error('NOT READY DO ACTUALLY SEND MAILS WITHOUT TEST MAIL RECEIVER SET YET')
+    throw new Error('Multiple to-addresses when TEST_MAIL_RECEIVER is set, something wrong with code cannot send mail')
   }
   const mailPayload = {
     to,
@@ -138,7 +160,19 @@ const sendPurreMail = async (to, subject, body, attachments = []) => {
       }
     }
   }
-  await axios.post(MAIL.URL, mailPayload, { headers: { 'x-functions-key': MAIL.KEY } })
+  if (Array.isArray(cc) && cc.length > 0) {
+    // @ts-ignore
+    mailPayload.cc = cc
+  }
+  if (Array.isArray(bcc) && bcc.length > 0) {
+    // @ts-ignore
+    mailPayload.bcc = bcc
+  }
+  if (!MAIL.URL || !MAIL.KEY) {
+    throw new Error('Missing MAIL.URL or MAIL.KEY in config, cannot send mail')
+  }
+  const { data } = await axios.post(MAIL.URL, mailPayload, { headers: { 'x-functions-key': MAIL.KEY } })
+  return data
 }
 
 module.exports = { sendReportMails }

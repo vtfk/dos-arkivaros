@@ -13,8 +13,13 @@ const createReportBody = (purreReceivers) => {
   let reportBody = ''
 
   for (const purreReceiver of purreReceivers.sort((a, b) => a.receiverId.localeCompare(b.receiverId))) {
+    const recieverIsLeader = purreReceiver.purreResult === 'send_to_responsible' && purreReceiver.responsibleForFollowUp?.leaders && purreReceiver.responsibleForFollowUp.leaders.length === 1 && purreReceiver.responsibleForFollowUp.leaders[0] === purreReceiver.toAddresses[0]
+
     reportBody += `<div style="border: 2px solid #ccc; padding: 16px; margin-bottom: 16px;">\n`
     reportBody += `<h3>Epost til${purreReceiver.purreResult === 'send_to_leaders' ? ` ledere for ${purreReceiver.responsibleEnterprise.enterprise.Name}` : ''}: ${purreReceiver.toAddresses.join(', ')}</h3>\n`
+    if (purreReceiver.purreResult === 'send_to_responsible') {
+      reportBody += `<p>På kopi: ${purreReceiver.ccAddresses.join(', ') || `Ingen${recieverIsLeader ? ' (saksbehandler er leder i enheten)' : ' (fant ingen leder for brukers enhet)'}`}</p>\n`
+    }
     reportBody += `Epost-status: ${purreReceiver.emailResult.status}<br />\n`
     reportBody += `<p>Dokumenter: ${purreReceiver.documentResults.length}</p>\n`
     // Så lister vi opp dokumentene og

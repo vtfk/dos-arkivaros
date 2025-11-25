@@ -43,6 +43,8 @@ const GetResponsibleUserResult = z.object({
   user: ArchiveUser.nullable(),
   contact: ArchiveContact.nullable(),
   email: z.email().nullable(),
+  leaders: z.array(z.email()),
+  enterprise: ArchiveEnterprise.nullable(),
   canReceivePurre: z.boolean(),
   reason: z.string().nullable()
 })
@@ -159,6 +161,8 @@ const getArchiveResponsibles = async () => {
       contact: responsibleUser?.contact || null,
       email: responsibleEmail,
       canReceivePurre: false,
+      leaders: [],
+      enterprise: null,
       reason: null
     })
     if (!responsibleUser) {
@@ -183,6 +187,14 @@ const getArchiveResponsibles = async () => {
       return result
     }
     result.canReceivePurre = true
+
+    // Da kan vi slenge på brukerens ledere og enterprise også, hvis vi finner noen
+    const userLeaders = responsibles.enterprises.find(rEnt => rEnt.enterprise.Recno === responsibleUser.contact?.EnterpriseEntity.Recno)
+    if (userLeaders) {
+      result.leaders = userLeaders.leaders.map(leader => leader.contact.Email)
+      result.enterprise = userLeaders.enterprise
+    }
+
     return result
   }
   /**
@@ -201,6 +213,7 @@ const getArchiveResponsibles = async () => {
     }
     return responsibleEnterprise
   }
+
   return { getResponsibleUser, getResponsibleEnterprise }
 }
 

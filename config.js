@@ -60,12 +60,13 @@ module.exports = {
   PURRE: {
     VALID_EMAIL_SUFFIX: process.env.PURRE_VALID_EMAIL_SUFFIX || '@vestfoldfylke.no',
     USE_CACHED_RESPONSE: process.env.PURRE_USE_CACHED_RESPONSE === 'true' || false,
-    ARCHIVE_EMAIL: process.env.PURRE_ARCHIVE_EMAIL || 'arkiv@vestfoldfylke.no',
+    ARCHIVE_EMAIL: process.env.PURRE_ARCHIVE_EMAIL || 'arkiv@fylke.no',
     LOCATOR_BASE_URL: process.env.PURRE_LOCATOR_BASE_URL || 'https://haha-glemt-i-env.public360online.com',
     MAIL_SENDER: process.env.PURRE_MAIL_SENDER || 'noreply@fylke.no',
     MAIL_TEMPLATE: process.env.PURRE_MAIL_TEMPLATE || 'default-template',
     TEST_MAIL_RECEIVER: process.env.PURRE_TEST_MAIL_RECEIVER,
-    IGNORE_LOGINS: (process.env.PURRE_IGNORE_LOGINS && (process.env.PURRE_IGNORE_LOGINS.split(','))) || []
+    IGNORE_LOGINS: (process.env.PURRE_IGNORE_LOGINS && (process.env.PURRE_IGNORE_LOGINS.split(','))) || [],
+    REPORT_BCCS: (process.env.PURRE_REPORT_BCCS && (process.env.PURRE_REPORT_BCCS.split(','))) || []
   },
   TEAMS_STATUS_WEBHOOK_URLS: (process.env.TEAMS_STATUS_WEBHOOK_URLS && (process.env.TEAMS_STATUS_WEBHOOK_URLS.split(','))) || []
 }

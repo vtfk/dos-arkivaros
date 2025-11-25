@@ -27,10 +27,12 @@ const PurreInput = z.object({
 
 /** @typedef {z.infer<typeof EmailResult>} */
 const EmailResult = z.object({
-  emailId: z.string().nullable(),
+  emailResponse: z.record(z.string(), z.string()).nullable(),
+  error: z.any().nullable(),
   status: z.enum(['IKKE_SENDT', 'SENDT', 'FEILET']),
 }).default({
-  emailId: null,
+  emailResponse: null,
+  error: null,
   status: 'IKKE_SENDT'
 })
 
@@ -38,6 +40,7 @@ const EmailResult = z.object({
 const PurreReceiver = z.object({
   receiverId: z.string(),
   toAddresses: z.array(z.email()),
+  ccAddresses: z.array(z.email()),
   responsibleEnterprise: ResponsibleEnterprise,
   responsibleForFollowUp: GetResponsibleUserResult.nullable(),
   purreResult: PurreResult,
